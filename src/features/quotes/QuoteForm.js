@@ -1,18 +1,43 @@
 import React, { useState } from "react";
 import { v4 as uuid } from "uuid";
+import { useDispatch } from "react-redux";
 import { addQuote } from "./quotesSlice";
 
 function QuoteForm() {
+
+  const [content, setContent] = useState("")
+  const [author, setAuthor] = useState("")
+  const [contentID, setContentID] = useState("")
+  const [votes, setVotes] = useState(0)
+
   const [formData, setFormData] = useState({
-    // set up a controlled form with internal state
-    // look at the form to determine what keys need to go here
+      content: content,
+      author: author,
+      id: contentID,
+      votes: votes,
   });
 
-  function handleChange(event) {
-    // Handle Updating Component State
+  const dispatch = useDispatch()
+
+  function handleChange(e) {
+    e.preventDefault()
+      if (e.target.name === 'content') {
+        setContent(e.target.value)
+      } else if (e.target.name === 'author') {
+        setAuthor(e.target.value)
+      }
+      setContentID(uuid())
+    setFormData({content: content, author: author, id: contentID, votes: votes})
   }
 
-  function handleSubmit(event) {
+  function handleSubmit(e) {
+    e.preventDefault()
+    console.log(formData)
+    dispatch(addQuote(formData))
+    setContent("")
+    setAuthor("")
+    setContentID("")
+    setVotes(0)
     // Handle Form Submit event default
     // Create quote object from state
     // Pass quote object to action creator
@@ -34,7 +59,9 @@ function QuoteForm() {
                     <textarea
                       className="form-control"
                       id="content"
-                      value={formData.content}
+                      value={content}
+                      name="content"
+                      onChange={handleChange}
                     />
                   </div>
                 </div>
@@ -47,13 +74,15 @@ function QuoteForm() {
                       className="form-control"
                       type="text"
                       id="author"
-                      value={formData.author}
+                      value={author}
+                      name="author"
+                      onChange={handleChange}
                     />
                   </div>
                 </div>
                 <div className="form-group">
                   <div className="col-md-6 col-md-offset-4">
-                    <button type="submit" className="btn btn-default">
+                    <button type="submit" className="btn btn-default" onClick={handleSubmit}>
                       Add
                     </button>
                   </div>
